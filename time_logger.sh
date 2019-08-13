@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Running hello_world.sh ..."
+echo "Running time_logger.sh: Please enter your activity"
 
 log_file="time_log.md"
 dir_status="status"
