@@ -22,6 +22,14 @@ dest_folder=$2
 delete_source_files=$3
 
 # TODO: nil check and check not the same folder and variables exist
+[ -z "$source_folder" ] && echo "Must have source folder" && exit
+[ -z "$dest_folder" ] && echo "Must have destination folder" && exit
+
+if [ "$source_folder" = "$dest_folder" ]; then
+  echo "Source folder cannot be the same as destination folder"
+  exit
+fi
+
 echo 'Moving photos from' $1 'to' $2 # TODO: Make this cleaner for file paths
 
 # Check I can access source & destination folders
@@ -46,4 +54,35 @@ if [ "$source_folder_file_count" -eq "0" ]; then
   exit;
 fi
 
+# Determine whether to just copy the files over or copy and delete
+if [ $delete_source_files = "true" ]; then
+  cmd="mv"
+else
+  cmd="cp"
+fi
+
+# Loop through and change files
+for file in $source_folder/* ; do
+  if [ ! -d "$file" ]; then
+    file_name=`echo $file | cut -d '/' -f 2` # Get file name
+    file_date=`echo $file | cut -d '/' -f 2 | cut -d '_' -f 1` # take file name and cut everything after the delimiter
+
+    year=`echo $file_date | cut -c1-4`
+    month=`echo $file_date | cut -c5-6`
+    day=`echo $file_date | cut -c7-8`
+    folder_name="$year-$month-$day"
+
+    # Create folder in destination folder corresponding to file date
+    if [ ! -d "$dest_folder/$folder_name" ]; then
+      echo "Making folder: $folder_name in destination folder"
+      mkdir $dest_folder/$folder_name
+    fi
+
+    # Copy / Move file
+    echo "$cmd $file $dest_folder/$file_date/$file_name"
+    `$cmd $file $dest_folder/$folder_name/$file_name`
+  fi
+done
+
 echo "Success!"
+
