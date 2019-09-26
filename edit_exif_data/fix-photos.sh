@@ -14,14 +14,22 @@ source_folder_file_count=$(ls -1q $source_folder | wc -l)
 echo "$source_folder has $source_folder_file_count files"
 
 for i in $source_folder*; do
-  current_jhead=$(jhead -model "COOLPIX AW110" "$i")
-  # echo $current_jhead
-  current_file_name=$(echo $current_jhead | cut -d$':' -f2 | cut -d$'.' -f1)
-  if [ -z "$current_jhead" ]; then
+  echo "---------------------i: $i------------------------"
+  #jhead -model "COOLPIX AW110" $i
+  #current_jhead=$(jhead -model "COOLPIX AW110" $i)
+  #current_file_name=$(echo $current_jhead | cut -d$':' -f2 | cut -d$'.' -f1)
+  jhead "$i"
+  if [[ $(jhead -model "COOLPIX AW110" "$i" | wc -m) -gt 0 ]]; then
+    echo "$i is a NIKON photo"
+  else
+    echo "$i failed"
     continue
   fi
-  current_file_name+=".JPG"
-  echo $current_file_name 
-  # jhead -ta $current_file_name by desired time
+  #current_file_name+=".JPG"
+  jhead "$i"
+  #echo $current_file_name
+  jhead -ta+00:17 "$i"
+  jhead "$i"
 done #do jhead "$i"; done
 
+echo "Complete"
